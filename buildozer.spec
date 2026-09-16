@@ -6,12 +6,12 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,wav,ttf,ogg
 source.include_patterns = assets/*
 version = 1.0.0
-requirements = python3,kivy,pillow
+requirements = python3==3.11.5,kivy==2.3.0,pillow
 orientation = portrait
 fullscreen = 0
 android.api = 33
 android.minapi = 24
-android.ndk = 25b
+android.ndk = 28c
 android.archs = arm64-v8a, armeabi-v7a
 
 [buildozer]
