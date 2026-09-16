@@ -28,7 +28,12 @@ else:
     _BASE = os.path.dirname(os.path.abspath(__file__))
 _FONT_PATH = os.path.join(_BASE, "assets", "font.ttf")
 LabelBase.register(name='Chinese', fn_regular=_FONT_PATH)
-Window.size = (1100, 750)
+from kivy.utils import platform
+if platform == 'android':
+    Window.fullscreen = True
+    Window.softinput_mode = 'below_target'
+else:
+    Window.size = (1100, 750)
 Window.clearcolor = (0.04, 0.05, 0.06, 1)
 
 # 兼容 PyInstaller 打包
@@ -687,20 +692,27 @@ class MusicManager:
     def __init__(self):
         self.current=None
         self.current_name=None
-    def play(self,name):
+       def play(self,name):
         if self.current_name==name: return
         if self.current:
             try: self.current.stop()
             except: pass
         path=os.path.join(MUSIC_DIR,name)
+        print(f"[音乐] 尝试加载 {path}")
         if not os.path.exists(path):
+            print(f"[音乐] 文件不存在：{path}")
             self.current=None; self.current_name=None; return
         try:
             sound=SoundLoader.load(path)
+            print(f"[音乐] 加载结果：{sound}")
             if sound:
-                sound.loop=True; sound.play()
-                self.current=sound; self.current_name=name
-        except: pass
+                sound.loop=True
+                sound.play()
+                self.current=sound
+                self.current_name=name
+                print(f"[音乐] 播放成功")
+        except Exception as e:
+            print(f"[音乐] 失败：{e}")
 
 
 class GameScreen(FloatLayout):
@@ -796,7 +808,7 @@ class GameScreen(FloatLayout):
     def add_choice(self,text,callback):
         btn=Button(text=text,font_name='Chinese',font_size='14sp',
                    background_color=(0.15,0.2,0.3,0.9),background_normal='',
-                   size_hint_y=None,height=50)
+                   size_hint_y=None, height=75
         btn.bind(on_press=lambda *x:callback())
         self.choices.add_widget(btn)
 
