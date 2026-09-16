@@ -1,20 +1,48 @@
-[app]
-title = 荣勋之路
-package.name = rongxunzhilu
-package.domain = cn.rongxun
-source.dir = .
-source.include_exts = py,png,jpg,kv,wav,ttf,ogg
-source.include_patterns = assets/*
-version = 1.0.0
-requirements = python3,kivy,pillow
-orientation = portrait
-fullscreen = 0
-android.api = 33
-android.minapi = 24
-android.ndk = 25b
-android.archs = arm64-v8a, armeabi-v7a
-p4a.branch = v2024.01.21
+name: Build APK
 
-[buildozer]
-log_level = 2
-warn_on_root = 1
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install buildozer cython
+
+      - name: Build APK with Buildozer
+        env:
+          JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          java -version
+          yes | buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: rongxun-apk
+          path: bin/*.apk
+          retention-days: 30
