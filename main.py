@@ -21,22 +21,24 @@ import os
 import sys
 from datetime import datetime
 
-import sys as _sys
-if getattr(_sys, 'frozen', False):
-    _BASE = _sys._MEIPASS
+# 兼容 PyInstaller 打包
+if getattr(sys, 'frozen', False):
+    BASE = sys._MEIPASS
 else:
-    _BASE = os.path.dirname(os.path.abspath(__file__))
-_FONT_PATH = os.path.join(_BASE, "assets", "font.ttf")
+    BASE = os.path.dirname(os.path.abspath(__file__))
+
+# 中文字体注册
+_FONT_PATH = os.path.join(BASE, "assets", "font.ttf")
 LabelBase.register(name='Chinese', fn_regular=_FONT_PATH)
+
+# 全屏（手机端）
 from kivy.utils import platform
 if platform == 'android':
     Window.fullscreen = True
     Window.softinput_mode = 'below_target'
 else:
     Window.size = (1100, 750)
-Window.clearcolor = (0.04, 0.05, 0.06, 1)
-
-# 兼容 PyInstaller 打包
+Window.clearcolor = (0.04, 0.05, 0.06, 1)# 兼容 PyInstaller 打包
 if getattr(sys, 'frozen', False):
     BASE = sys._MEIPASS
 else:
@@ -702,9 +704,9 @@ class MusicManager:
             except:
                 pass
         path = os.path.join(MUSIC_DIR, name)
-        print(f"[音乐] 尝试加载 {path}")
+        print(f"[音乐] 尝试加载: {path}")
         if not os.path.exists(path):
-            print(f"[音乐] 文件不存在: {path}")
+            print(f"[音乐] 文件不存在")
             self.current = None
             self.current_name = None
             return
@@ -716,10 +718,11 @@ class MusicManager:
                 sound.play()
                 self.current = sound
                 self.current_name = name
-                print(f"[音乐] 播放成功")
+                print(f"[音乐] 播放成功: {name}")
+            else:
+                print(f"[音乐] 加载返回 None（格式可能不兼容）")
         except Exception as e:
-            print(f"[音乐] 失败: {e}")
-
+            print(f"[音乐] 异常: {e}")
 
 class GameScreen(FloatLayout):
     def __init__(self,**kwargs):
@@ -814,7 +817,7 @@ class GameScreen(FloatLayout):
     def add_choice(self,text,callback):
         btn=Button(text=text,font_name='Chinese',font_size='14sp',
                    background_color=(0.15,0.2,0.3,0.9),background_normal='',
-                   size_hint_y=None, height=75
+                   size_hint_y=None,height=75)
         btn.bind(on_press=lambda *x:callback())
         self.choices.add_widget(btn)
 
