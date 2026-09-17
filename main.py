@@ -690,29 +690,35 @@ def check_recruitment_time():
 
 class MusicManager:
     def __init__(self):
-        self.current=None
-        self.current_name=None
-       def play(self,name):
-        if self.current_name==name: return
+        self.current = None
+        self.current_name = None
+
+    def play(self, name):
+        if self.current_name == name:
+            return
         if self.current:
-            try: self.current.stop()
-            except: pass
-        path=os.path.join(MUSIC_DIR,name)
+            try:
+                self.current.stop()
+            except:
+                pass
+        path = os.path.join(MUSIC_DIR, name)
         print(f"[音乐] 尝试加载 {path}")
         if not os.path.exists(path):
-            print(f"[音乐] 文件不存在：{path}")
-            self.current=None; self.current_name=None; return
+            print(f"[音乐] 文件不存在: {path}")
+            self.current = None
+            self.current_name = None
+            return
         try:
-            sound=SoundLoader.load(path)
-            print(f"[音乐] 加载结果：{sound}")
+            sound = SoundLoader.load(path)
+            print(f"[音乐] 加载结果: {sound}")
             if sound:
-                sound.loop=True
+                sound.loop = True
                 sound.play()
-                self.current=sound
-                self.current_name=name
+                self.current = sound
+                self.current_name = name
                 print(f"[音乐] 播放成功")
         except Exception as e:
-            print(f"[音乐] 失败：{e}")
+            print(f"[音乐] 失败: {e}")
 
 
 class GameScreen(FloatLayout):
